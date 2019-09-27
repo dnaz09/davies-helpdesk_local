@@ -1,0 +1,377 @@
+@extends('layouts.master')
+@section('main-body')
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-12">
+        <h2><i class="fa fa-plus"></i>BORROWERS REQUEST DETAILS</h2>
+        <ol class="breadcrumb">
+            <li><a href="#">Dashboard</a></li>            
+            <li><a href="#">Admin</a></li>            
+            <li><a href="#">Request</a></li>   
+            <li class="active"><strong>Details</strong></li>
+        </ol>
+    </div>
+</div>        
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-md-12 animated flash">
+            <?php if (session('is_success')): ?>
+                <div class="alert alert-success alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                </button>
+                    <center><h4>Success! <i class="fa fa-check"></i></h4></center>                
+                </div>
+            <?php endif;?>
+        </div>
+        <div class="col-md-12 animated flash">
+            <?php if (session('is_closed')): ?>
+                <div class="alert alert-success alert-dismissible flash" role="alert">            
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+            </button>
+                    <center><h4>Request Has Been Closed!</h4></center>   
+                </div>
+           <?php endif;?>
+        </div>    
+        <div class="col-md-12 animated flash">
+            @if(count($errors) > 0)
+                <div class="alert alert-danger alert-dismissible flash" role="alert">            
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+            </button>
+                    <center><h4>Oh snap! You got an error!</h4></center>   
+                </div>
+            @endif
+        </div>    
+                   
+    </div>    
+</div>    
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title" style="background-color:#009688">
+                    <h5 style="color:white"><i class="fa fa-plus"></i>REQUEST DETAILS <small></small></h5>          
+                </div> 
+                <div class="ibox-content">
+                    <table class="table table-hover table-bordered">
+                        <tr>
+                            <td style="width:30%"><i><strong>REQUEST BY:</strong></i></td><td>{!! strtoupper($asset_reqs->user->first_name.' '.$asset_reqs->user->last_name) !!}</td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>BORROWED BY:</strong></i></td><td>{!! strtoupper($asset_reqs->borrower_name) !!}</td>
+                        </tr>                       
+                        <tr>
+                            <td style="width:30%"><i><strong>REQUEST #:</strong></i></td><td>{!! $asset_reqs->req_no !!}</td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>SUPERIOR STATUS:</strong></i></td>
+                            <td>
+                                @if($asset_reqs->sup_action < 2)
+                                    <span class="label label-warning"> <i class="fa fa-angellist"></i>Pending</span>
+                                @else
+                                    <span class="label label-primary"> <i class="fa fa-angellist"></i>Approved</span>
+                                @endif
+                            </td>
+                        </tr>                                                                                                                            
+                        <tr>
+                            <td style="width:30%"><i><strong>STATUS:</strong></i></td>
+                            <td>
+                                @if($asset_reqs->status < 2)
+                                    <span class="label label-warning"> <i class="fa fa-angellist"></i>Pending</span>
+                                @else
+                                    <span class="label label-primary"> <i class="fa fa-angellist"></i>Approved</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                                <td style="width:30%"><i><strong>DATE NEEDED:</strong></i></td>
+                                <td>
+                                    
+                                    {{ date('Y/m/d',strtotime($dets[0]->date_needed))}}
+                                </td>
+                        </tr>
+                        <tr>
+                                <td style="width:30%"><i><strong>RETURN DATE:</strong></i></td>
+                                <td>
+                                    
+                                    {{ date('Y/m/d',strtotime($dets[0]->must_date))}}
+                                </td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>DETAILS:</strong></i></td><td>{!! strtoupper($asset_reqs->details) !!}</td>
+                        </tr>                            
+                        <tr>
+                            <td style="width:30%"><i><strong>RESOLVED BY:</strong></i></td>
+                            <td>
+                                @if($asset_reqs->solved > 0)
+                                    {!! strtoupper($asset_reqs->solved->first_name.' '.$asset_reqs->solved->last_name) !!}
+                                @else
+                                    N/A
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                                <td style="width:30%"><i><strong>DOWNLOAD:</strong></i></td>
+                                <td>
+                                    @if($asset_reqs->status != 5)
+                                        @if($asset_reqs->sup_action == 2)
+                                        {{-- <a href="http://pdf-generator.davies-helpdesk.com/borrower_slip/{{$asset_req->req_no}}/{{$asset_req->user_id}}/generate" id="{{$asset_req->id}}" target="__blank"><span class="label label-primary"><i class="fa fa-check"></i> Download</span></a> --}}
+                                        <a href="/borrower_slip/{{$asset_reqs->req_no}}/{{$asset_reqs->user_id}}/generate" id="{{$asset_reqs->id}}" target="__blank"><span class="label label-primary"><i class="fa fa-check"></i> Download</span></a>
+                                        @endif
+                                    @endif
+                                </td>
+
+                        </tr>
+                    </table>
+                    <div class="ibox float-e-margins">
+                            <div class="ibox-title" style="background-color:#009688">
+                                <h5 style="color:white"><i class="fa fa-plus"></i> LIST OF ITEMS</h5>  
+                            </div> 
+                            <div class="ibox-content"> 
+                                    <table class="table table-hover table-bordered">
+                                            <tr>                                                        
+                                                <th>ITEM NAME</th>
+                                                <th>QTY REQUESTED</th>
+                                                <th>QTY RELEASED</th>
+                                                <th>STATUS</th>  
+                                                <th>ACTION</th>                              
+                                            </tr>
+                                            <tbody>
+                                                @foreach($dets as $det)                           
+                                                <tr>       
+                                                    <td>{!! $det->item !!}</td>   
+                                                    <td>
+                                                        @if($asset_reqs->sup_action < 2)
+                                                            <div class="normalcol">
+                                                                <span class="span_qty">{!! $det->qty !!}</span>
+                                                                <button type="button" class="btn btn-warning btn-xs pull-right btneditqty">Edit</button>
+                                                            </div>
+                            
+                                                            <div class="editform hidden">
+                                                                <div class="input-group">
+                                                                        {!! Form::hidden('value', $det->id, ['class'=>'hiddeneditid']) !!}
+                                                                        {!! Form::number('value',$det->qty,['class'=>'input-sm form-control numberqty','required','placeholder'=>'Value...','id'=>'value_id']) !!}
+                                                                    <span class="input-group-btn">
+                                                                        <button class="btn btn-warning btn-sm saveqtyedit" id="saveqtyedit" type="submit">Save</button>
+                                                                        <button class="btn btn-danger btn-sm cancelqtyedit"  id="cancelqtyedit" type="button">Cancel</button>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        @else
+                                                            {!! $det->qty !!}
+                                                        @endif
+                                                    </td>
+                                                    <td>{!! $det->qty_r !!}</td>                         
+                                                    <td>
+                                                        @if($det->released == 1 && $det->returned == 1)
+                                                            <span class="label label-success"> <i class="fa fa-angellist"></i>Returned</span>
+                                                        @elseif($det->released == 1)
+                                                            <span class="label label-primary"> <i class="fa fa-angellist"></i>Released</span>
+                                                        @elseif($det->released == 2)
+                                                            <span class="label label-danger"> <i class="fa fa-angellist"></i>Denied</span>
+                                                        @else
+                                                            <span class="label label-warning"> <i class="fa fa-angellist"></i>Pending</span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        @if($asset_reqs->sup_action < 2)
+                                                            <button class="btn btn-xs btn-danger btnRemoveItem" value="{{$det->id}}">Remove Item</button>
+                                                        @endif
+                                                    </td>                          
+                                                </tr>                                
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                            </div>
+                    </div>                                         
+
+                    @if($asset_reqs->sup_action == 2)
+                    @if(!empty($slips))
+                    <h3>ASSET BORROWER's CODE</h3>
+                    <p><b>Note:</b> Present this code to the admin to get the asset you have requested.</p>
+                        <table class="table table-hover table-bordered">
+                            <tr>
+                                <th><h5 style="font-size: 40px; ">
+                                    {!!$slips->borrow_code!!}
+                                </h5></th>
+                            </tr>
+                        </table>
+                    @endif
+                    @endif          
+                </div>                   
+            </div>                                      
+        </div> 
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title" style="background-color:#009688">
+                    <h5 style="color:white"><i class="fa fa-plus"></i>ADD REMARKS <small></small></h5>          
+                </div>
+                @if($asset_reqs->status < 2)
+                {!! Form::open(array('route'=>'my_request_list.remarks','method'=>'POST','files'=>true)) !!}
+                <div class="ibox-content">
+                    <div class="form-group" >
+                        {!! Form::label('remarks','Add Your Remarks') !!}
+                        {!! Form::textarea('remarks','',['class'=>'form-control','placeholder'=>'You Remarks Here...','required'=>'required']) !!}                       
+                    </div>
+                    <div class="row" style="padding-top:5px;">
+                        <div class="col-lg-12">                  
+                            {!! Form::label('attached','Attached File')!!}
+                            {!! Form::file('attached[]', array('id' => 'filer_inputs', 'class' => 'photo_files', 'accept' => 'pdf|docx')) !!}                   
+                        </div>
+                    </div>
+                    <div class="form-group">  
+                        {!! Form::hidden('request_id',$asset_reqs->id) !!}                               
+                        {!! Form::hidden('ticket_no',$asset_reqs->req_no) !!}
+                        <br>
+                        <button class="btn btn-warning" id="remarksonly" type="button"> Remarks</button>                    
+                        <button class="btn btn-warning hidden" id="remarksent" name ="sub" value="1" type="submit">Submit Remarks</button>
+                    </div>                      
+                </div> 
+                {!! Form::close() !!}                  
+                @else
+                @endif
+               
+            </div> 
+        </div>
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                 <div class="ibox-title" style="background-color:#009688">
+                    <h5 style="color:white">Remarks</h5>                    
+                </div>
+
+                <div class="ibox-content inspinia-timeline" id="flow2">
+                @forelse($remarks as $remark)
+                    <div class="timeline-item">
+                        <div class="row">
+                            <div class="col-xs-3 date">
+                                <i class="fa fa-briefcase"></i>
+                                {!! $remark->created_at->format('M-d-Y h:i a') !!}
+                                <br/>
+                                <small class="text-navy">{!! $remark->created_at->diffForHumans() !!}</small>
+                            </div>
+                            <div class="col-xs-7 content no-top-border">
+                                <p class="m-b-xs"><strong>{!! strtoupper($remark->user->first_name.' '.$remark->user->last_name ) !!}</strong></p>
+                                <p>{!! $remark->details !!}</p>                                
+                                <div>
+                                    @if(!empty($remark->files))
+                                        @foreach($remark->files as $filer)
+                                            {!! Form::open(array('route'=>'asset_request.remarks_download_files','method'=>'POST', 'target'=>'_blank')) !!}
+                                            {!! Form::hidden('encname',$filer->encryptname) !!}
+                                            {!! Form::submit($filer->filename, array('type' => 'submit', 'class' => 'btn btn-primary btn-xs')) !!}                                                                                                  
+                                            {!! Form::close() !!}                                                                                                                                         
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    ....No Remarks Found
+                @endforelse   
+                </div>
+            </div>
+        </div>    
+                   
+    </div>    
+</div>   
+
+@stop
+@section('page-script')
+
+$('.btnRemoveItem').click(function () {
+    
+    id = $(this).val();
+    var data_to_send = {
+        id: id
+    };
+    var data = {
+        swal_title: "Are you sure you want to remove this item?",
+        swal_text: "Your request will be sent",
+        swal_icon: "warning",
+        swal_button: "Yes, I am sure!",
+        ajax_url: "/my_request_list/asset/"+id+"/delete_item",
+        ajax_type: "get",
+        ajax_data: data_to_send,
+        swal_success: "Item removed successfully",
+        process_type: 2
+    };
+
+    swal_ajax(data);
+    
+});
+
+
+$(".btneditqty").click(function(){
+    var parent = $(this).parent();
+
+    parent.addClass('hidden');
+    parent.next().removeClass('hidden');
+
+}); 
+
+$(".cancelqtyedit").click(function(){
+    var getclass = $(this).closest("td");
+    var qty = getclass.find(".span_qty").text();
+
+    getclass.find(".editform").addClass("hidden");
+    getclass.find(".normalcol").removeClass("hidden");
+    getclass.find(".numberqty").val(qty);
+
+}); 
+
+$('.saveqtyedit').click(function () {
+    var closest = $(this).closest("td");
+    var newqty =  closest.find(".numberqty").val();
+    var id = closest.find(".hiddeneditid").val();
+    var type = 2;
+    swal({
+        title: "Are you sure you want to edit the quantity of this item?",
+        text: "Your request will be sent!",
+        icon: "warning",
+        dangerMode: true,
+        showCancelButton: true,
+        confirmButtonText: "Yes, i am sure!"
+    },function(){
+        $.ajax({
+              url: '/asset_trackings/{{$det->id}}/edit_quantity',
+              type: "get",
+              data: {id:id, newqty:newqty, type:type},
+              success: function(response){ 
+                if(response == 'S'){
+
+                    closest.find(".editform").addClass("hidden");
+                    closest.find(".normalcol").removeClass("hidden");
+                    closest.find(".span_qty").text(newqty);
+                    
+                    swal(
+                      'Success!',
+                      'Quantity edited successfully',
+                      'success'
+                    )
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                }
+              }
+        });
+    });
+});
+
+    $('#filer_inputs').filer({
+
+        showThumbs:true,
+        addMore:true
+    });   
+
+$('#remarksonly').click(function () {
+    swal({
+        title: "Are you sure?",
+        text: "Your remarks will be sent!",
+        icon: "warning",
+        dangerMode: true,
+        showCancelButton: true,
+        confirmButtonText: "Yes, i am sure!"
+    },function(){
+        $('#remarksent').click();
+    });
+});
+@endsection

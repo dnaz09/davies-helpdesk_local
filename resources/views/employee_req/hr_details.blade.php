@@ -1,0 +1,427 @@
+@extends('layouts.master')
+@section('main-body')
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-12">
+        <h2><i class="fa fa-plus"></i>REQUISITION DETAILS</h2>        
+    </div>
+</div>        
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-md-12 animated flash">
+            <?php if (session('is_success')): ?>
+                <div class="alert alert-success alert-dismissible fade in" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+                </button>
+                    <center><h4>Success! <i class="fa fa-check"></i></h4></center>                
+                </div>
+            <?php endif;?>
+        </div>
+        <div class="col-md-12 animated flash">
+            <?php if (session('is_closed')): ?>
+                <div class="alert alert-success alert-dismissible flash" role="alert">            
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+            </button>
+                    <center><h4>Request Has Been Closed!</h4></center>   
+                </div>
+           <?php endif;?>
+        </div>    
+        <div class="col-md-12 animated flash">
+            @if( count($errors) > 0)
+                <div class="alert alert-danger alert-dismissible flash" role="alert">            
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span>
+            </button>
+                    <center><h4>Oh snap! You got an error!</h4></center>   
+                </div>
+            @endif
+        </div>    
+                   
+    </div>    
+</div>    
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">        
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title" style="background-color:#009688">
+                    <h5 style="color:white"><i class="fa fa-plus"></i>EMPLOYEE REQUISITION DETAILS <small></small></h5>          
+                </div> 
+                <div class="ibox-content">                
+                    <table class="table table-hover table-bordered">                                       
+                        <tr>
+                            <td style="width:30%"><i><strong>REQUISITIONER:</strong></i></td><td>{!! strtoupper($req->user->first_name.' '.$req->user->last_name) !!}</td>
+                        </tr>                                       
+                        <tr>
+                            <td style="width:30%"><i><strong>DEPARTMENT:</strong></i></td><td>{!! strtoupper($req->user->department->department) !!}</td>
+                        </tr>                                       
+                        <tr>
+                            <td style="width:30%"><i><strong>DATE REQUESTED:</strong></i></td><td>{!! date('m/d/y',strtotime($req->created_at)) !!}</td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>TIME:</strong></i></td><td>{!! date('h:i a',strtotime($req->created_at)) !!}</td>
+                        </tr>                                       
+                        <tr>
+                            <td style="width:30%">
+                                <i><strong>DATE NEEDED:</strong></i>
+                            </td>
+                            <td>
+                                @if($req->hr_action != 2 && $req->hr_action != 5)
+                                        <div class="normalcol">
+                                            <span class="span_qty">{!! date('m/d/y',strtotime($req->date_needed)) !!}</span>
+                                            <button type="button" class="btn btn-warning btn-xs pull-right btnEditDate">Edit</button>
+                                        </div>
+
+                                        <div class="editform hidden">
+                                            <div class="row">
+                                                    {!! Form::hidden('value', $req->id, ['class'=>'hiddeneditid']) !!}
+                                                    {{-- {!! Form::text('value', date('m/d/y',strtotime($work->date_needed)),['class'=>'input-sm form-control numberqty','required','placeholder'=>'Value...','id'=>'value_id']) !!} --}}
+                                                <div class="col-xs-6">
+                                                    <div class="input-group date">
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span><input type="text" class="form-control inputDate" value="{{ date('m/d/y',strtotime($req->date_needed)) }}" id="input_text" name="date_needed" required="" readonly="">
+                                                    </div>
+                                                </div>
+                                                <div class="col-xs-6">
+                                                        <button class="btn btn-warning btn-sm saveEditDate" id="saveqtyedit" type="submit">Save</button>
+                                                        <button class="btn btn-danger btn-sm cancelEditDate"  id="cancelqtyedit" type="button">Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                @else
+                                {!! date('m/d/y',strtotime($req->date_needed)) !!}
+                                @endif
+
+                            </td>
+                        </tr> 
+                        <tr>
+                            <td style="width:30%"><i><strong>WORK SITE:</strong></i></td><td>{!! strtoupper($req->work_site) !!}</td>
+                        </tr> 
+                        <tr>
+                            <td style="width:30%"><i><strong>NUMBER NEEDED:</strong></i></td><td>{!! strtoupper($req->no_needed) !!}</td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>REQUEST TYPE:</strong></i></td>
+                            <td>
+                            	@if($req->req_type == 1)
+                            		CONTRACTUAL
+                            	@else
+                            		FOR PROBATIONARY
+                            	@endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>PREFERRED AGE:</strong></i></td><td>{!! strtoupper($req->age) !!}</td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>PREFERRED GENDER:</strong></i></td>
+                            <td>
+                            	@if($req->gender == 1)
+                            		MALE
+                            	@else
+                            		FEMALE
+                            	@endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>EDUCATIONAL BACKGROUND, OTHERS:</strong></i></td>
+                            <td>
+                            	{!! $req->details !!}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>RECOMMENDED BY:</strong></i></td>
+                            <td>
+                                {!! $req->mgr->first_name.' '.$req->mgr->last_name !!}
+                            </td>
+                        </tr>                                     
+                        <tr>
+                            <td style="width:30%"><i><strong>APPROVED BY HR:</strong></i></td>
+                            <td>
+                                @if($req->hr_action == 1)
+                                    {!! strtoupper($req->hr->first_name.' '.$req->hr->last_name)!!}
+                                @else
+                                @endif
+                                @if($req->hr_action == 0)
+                                <span class="label label-warning"> <i class="fa fa-angellist"></i>Pending</span>
+                                @elseif($req->hr_action == 1)
+                                <span class="label label-primary"> <i class="fa fa-angellist"></i>Approved</span>
+                                @elseif($req->hr_action == 2)
+                                <span class="label label-danger"> <i class="fa fa-angellist"></i>Denied</span>
+                                @elseif($req->hr_action == 5)
+                                <span class="label label-info"> <i class="fa fa-angellist"></i>Cancelled</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>REQUEST FILES (JOB DESCRIPTION):</strong></i></td>
+                            <td>
+                                @foreach($files as $file)
+                                    {!! Form::open(array('route'=>'emp_requisition.download','method'=>'POST')) !!}
+                                    {!! Form::hidden('id',$file->id) !!}
+                                    <button type="submit" class="btn btn-xs btn-primary">{!!$file->filename!!}</button><br>
+                                    {!! Form::close() !!}
+                                @endforeach
+                            </td>
+                        </tr>
+                    </table>
+                    @if($req->hr_action == 1)
+                    <hr>
+                    <table class="table table-hover table-bordered">
+                        <tr>
+                            <td style="width:30%"><i><strong>RECEIVED BY:</strong></i></td>
+                            <td>
+                                {!! strtoupper($req_d->hrd->first_name.' '.$req_d->hrd->last_name) !!}    
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>DATE RECEIVED:</strong></i></td>
+                            <td>
+                                {!! $req_d->created_at !!}    
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%"><i><strong>RECOMMENDING APPROVAL:</strong></i></td>
+                            <td>
+                                @if($req_d->reco_approval == 1)
+                                {!! strtoupper($req_d->recommendor->first_name.' '.$req_d->recommendor->last_name) !!} <span class="label label-primary"> <i class="fa fa-angellist"></i>Approved</span>
+                                @else
+                                <span class="label label-warning"> <i class="fa fa-angellist"></i>Pending</span>
+                                @endif   
+                            </td>
+                        </tr>
+                        @endif 
+                    </table>                                                                             
+                </div>                   
+            </div>                                      
+        </div> 
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title" style="background-color:#009688">
+                    <h5 style="color:white"><i class="fa fa-plus"></i>ADD REMARKS <small></small></h5>          
+                </div>         
+                    <div class="ibox-content">
+                        @if($req->sup_action < 1 || $req->hr_action < 1 && $req->sup_action != 5 && $req->hr_action != 5) 
+                        {!! Form::open(array('route'=>'hrd_emp_req.remarks','method'=>'POST','files'=>true)) !!}                
+                            <div class="form-group" >
+                                {!! Form::label('details','Add Your Remarks') !!}
+                                {!! Form::textarea('details','',['class'=>'form-control','placeholder'=>'You Remarks Here...','required'=>'required']) !!}                       
+                            </div>
+                            <div class="row" style="padding-top:5px;">
+                                <div class="col-lg-12">                  
+                                    {!! Form::label('attached','Attached File')!!}
+                                    {!! Form::file('attached[]', array('id' => 'filer_inputs', 'class' => 'photo_files', 'accept' => 'pdf|docx')) !!}                   
+                                </div>
+                            </div>                
+                            <div class="form-group">  
+                                {!! Form::hidden('ereq_no',$req->ereq_no) !!}          
+                                @if($req->hr_action < 1)
+                                    <button class="btn btn-warning" id="remarksonly" type="button"> Remarks</button>
+                                    <button class="btn btn-success" id="approveonly" type="button"> Approve</button>
+                                    <button class="btn btn-danger" id="denyonly" type="button"> Deny</button>
+                                    <button class="btn btn-warning hidden" id="remarksent" name ="sub" value="1" type="submit">Remarks Only</button>                                                         
+                                    <button class="btn btn-warning hidden" id="approvesent" name ="sub" value="3" type="submit">Remarks Only</button>                                                         
+                                    <button class="btn btn-warning hidden" id="denysent" name ="sub" value="4" type="submit">Remarks Only</button>                                                       
+                                @else
+                                @endif
+                            </div>                      
+                        {!! Form::close() !!}
+                        @endif  
+
+                        @if($req->hr_action != 2 && $req->hr_action != 5)
+                            <div class="form-group">  
+                                <button type="button" id="cancel" class="btn btn-info btncancelall"> Cancel Requisition</button>
+                            </div>
+                        @endif  
+                    </div>         
+
+            </div> 
+        </div>
+        <div class="col-lg-6">
+            <div class="ibox float-e-margins">
+                 <div class="ibox-title" style="background-color:#009688">
+                    <h5 style="color:white">Remarks</h5>                    
+                </div>
+
+                <div class="ibox-content inspinia-timeline" id="flow2">
+                    @forelse($remarks as $remark)
+                        <div class="timeline-item">
+                            <div class="row">
+                                <div class="col-xs-3 date">
+                                    <i class="fa fa-briefcase"></i>
+                                    {!! $remark->created_at->format('M-d-Y h:i a') !!}
+                                    <br/>
+                                    <small class="text-navy">{!! $remark->created_at->diffForHumans() !!}</small>
+                                </div>
+                                <div class="col-xs-7 content no-top-border">
+                                    <p class="m-b-xs"><strong>{!! strtoupper($remark->user->first_name.' '.$remark->user->last_name ) !!}</strong></p>
+                                    <p>{!! $remark->remark !!}</p>
+                                    @if(!empty($remark->files))
+                                        @foreach($remark->files as $file)
+                                            {!! Form::open(array('route'=>'hrd_emp_req.download_remark','method'=>'POST, 'target'=>'_blank'')) !!}
+                                            {!! Form::hidden('encname',$file->encryptname) !!}
+                                            {!! Form::submit($file->filename, array('type' => 'submit', 'class' => 'btn btn-primary btn-xs')) !!}                                                        
+                                            {!! Form::close() !!}   
+                                        @endforeach
+                                    @endif                               
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        ....No Remarks Found
+                    @endforelse   
+                </div>
+            </div>
+        </div>            
+    </div>    
+</div>
+@stop
+@section('page-script')
+$('.input-group.date').datepicker({
+    todayBtn: "linked",
+    keyboardNavigation: false,
+    forceParse: false,
+    calendarWeeks: true,
+    autoclose: true,
+    dateFormat: "yy-mm-dd",
+    startDate: new Date()
+});
+
+$(".btnEditDate").click(function(){
+    var parent = $(this).parent();
+
+    parent.addClass('hidden');
+    parent.next().removeClass('hidden');
+
+}); 
+
+$(".cancelEditDate").click(function(){
+    var getclass = $(this).closest("td");
+    var qty = getclass.find(".span_qty").text();
+
+    getclass.find(".editform").addClass("hidden");
+    getclass.find(".normalcol").removeClass("hidden");
+    getclass.find(".inputDate").val(qty);
+
+}); 
+
+$('.saveEditDate').click(function () {
+
+    var closest = $(this).closest("td");
+    var newDate =  closest.find(".inputDate").val();
+    var id = closest.find(".hiddeneditid").val();
+    if(!newDate == ""){
+        swal({
+            title: "Are you sure you want to edit the date of this request?",
+            text: "Your request will be sent!",
+            icon: "warning",
+            dangerMode: true,
+            showCancelButton: true,
+            confirmButtonText: "Yes, i am sure!"
+        },function(){
+            $.ajax({
+                  url: '/hrd_emp_req/{{$req->id}}/editDate',
+                  type: "get",
+                  data: {id:id, newDate:newDate},
+                  success: function(response){ 
+                    if(response == 'S'){
+
+                        closest.find(".editform").addClass("hidden");
+                        closest.find(".normalcol").removeClass("hidden");
+                        closest.find(".span_qty").text(newDate);
+                        
+                        swal(
+                          'Success!',
+                          'Date edited successfully',
+                          'success'
+                        )
+                    }
+                  }
+            });
+        });
+    }else{
+        swal(
+          'Error!',
+          'Date is required.',
+          'error'
+        )
+    }
+});
+
+$('.btncancelall').click(function () {
+    swal({
+        title: "Are you sure you want to cancel this requisition request?",
+        text: "This action cannot be undone",
+        icon: "warning",
+        dangerMode: true,
+        showCancelButton: true,
+        confirmButtonText: "Yes, i am sure!"
+    },function(){
+        $.ajax({
+            type:"get",
+            data: {
+                "id": {{$req->id}},
+            },
+            url: '/hrd_emp_req/{{$req->id}}/cancel_hr',
+            success: function(data){
+                var type = data.type;
+                if(type == 1){
+                    
+                    swal(
+                      'Success!',
+                      'Requisition Request cancelled successfuly',
+                      'success'
+                    )
+
+                    setTimeout(function() {
+                          location.reload();
+                          }, 800);
+                }
+
+                if(type == 2){
+                    swal('There is an error in approving your request');
+                    location.reload();
+                }
+            }    
+        });
+    });
+});
+
+$('#filer_inputs').filer({
+    showThumbs:true,
+    addMore:true
+});
+$('#remarksonly').click(function () {
+    swal({
+        title: "Are you sure?",
+        text: "Your remarks will be sent!",
+        icon: "warning",
+        dangerMode: true,
+        showCancelButton: true,
+        confirmButtonText: "Yes, i am sure!"
+    },function(){
+        $('#remarksent').click();
+    });
+});
+$('#approveonly').click(function () {
+    swal({
+        title: "Are you sure?",
+        text: "This request will be approved!",
+        icon: "warning",
+        dangerMode: true,
+        showCancelButton: true,
+        confirmButtonText: "Yes, i am sure!"
+    },function(){
+        $('#approvesent').click();
+    });
+});
+$('#denyonly').click(function () {
+    swal({
+        title: "Are you sure?",
+        text: "This request will be denied!",
+        icon: "warning",
+        dangerMode: true,
+        showCancelButton: true,
+        confirmButtonText: "Yes, i am sure!"
+    },function(){
+        $('#denysent').click();
+    });
+});
+@stop

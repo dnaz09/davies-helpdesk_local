@@ -1,0 +1,15 @@
+/1node_modules
+/2node_modules
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/vendor
+/.idea
+/.vagrant
+/public/uploads
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+.env
